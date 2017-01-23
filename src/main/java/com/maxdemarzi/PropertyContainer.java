@@ -31,6 +31,11 @@ public class PropertyContainer {
         return properties.get(key);
     }
 
+    public Integer getIntegerProperty(String key) {
+        return (Integer)properties.get(key);
+    }
+
+
     @Override
     public boolean equals(Object o) {
         // self check
@@ -44,8 +49,8 @@ public class PropertyContainer {
             return false;
         PropertyContainer propertyContainer = (PropertyContainer) o;
         // field comparison
-        return Objects.equals(id, propertyContainer.id);
-                //&& Objects.equals(properties, propertyContainer.properties);
+        return Objects.equals(id, propertyContainer.id)
+                && Objects.equals(properties, propertyContainer.properties);
     }
 
     @Override

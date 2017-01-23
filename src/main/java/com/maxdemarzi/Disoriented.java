@@ -112,9 +112,12 @@ public class Disoriented {
     }
 
     public boolean updateNode (String id, String value)  {
-         final Query<PropertyContainer> query = equal(PropertyContainer.ID, id); 
-         if (nodes.retrieve(query).isNotEmpty()) {
-            try {
+         final Query<PropertyContainer> query = equal(PropertyContainer.ID, id);
+        ResultSet<PropertyContainer> results = nodes.retrieve(query);
+         if (results.isNotEmpty()) {
+             PropertyContainer node = results.uniqueResult();
+             nodes.remove(node);
+             try {
                 nodes.add(new PropertyContainer(id, mapper.readValue(value, HashMap.class)));
             } catch (IOException e) {
                 HashMap<String, Object> properties = new HashMap<>();

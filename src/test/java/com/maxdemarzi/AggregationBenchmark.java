@@ -22,7 +22,7 @@ public class AggregationBenchmark {
         for (int person = 0; person < 1632803; person++) {
             HashMap<String, Object> properties = new HashMap<>();
             properties.put("id" + person, "id" + person);
-            properties.put("weight", rand.nextInt(120));
+            properties.put("age", rand.nextInt(120));
             db.addNode("id" + person, properties);
         }
     }
@@ -35,14 +35,14 @@ public class AggregationBenchmark {
     @Threads(4)
     @BenchmarkMode(Mode.Throughput)
     @OutputTimeUnit(TimeUnit.SECONDS)
-    public void measureAggregation2() throws IOException {
+    public void measureAggregation() throws IOException {
         Iterator<PropertyContainer> iter = db.getAllNodes();
-        HashMap<Integer, Integer> weights = new HashMap<>();
-        Integer weight;
+        HashMap<Integer, Integer> ages = new HashMap<>();
+        Integer age;
         while (iter.hasNext()) {
             PropertyContainer nodeEntry = iter.next();
-            weight = (Integer) nodeEntry.getProperties().get("weight");
-            weights.merge(weight, 1, Integer::sum);
+            age = (Integer) nodeEntry.getProperties().get("age");
+            ages.merge(age, 1, Integer::sum);
         }
     }
 
