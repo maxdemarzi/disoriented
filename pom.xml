@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.jooby</groupId>
+        <artifactId>jooby-project</artifactId>
+        <version>1.0.1</version>
+    </parent>
+
+    <groupId>com.maxdemarzi</groupId>
+    <artifactId>Disoriented</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <junit.version>4.12</junit.version>
+        <guava.version>20.0</guava.version>
+        <jooby.version>1.0.1</jooby.version>
+        <jmh.version>1.17.3</jmh.version>
+        <restassured.version>3.0.1</restassured.version>
+        <maven-compiler.version>3.6.0</maven-compiler.version>
+        <coveralls.version>4.3.0</coveralls.version>
+        <jacoco.version>0.7.8</jacoco.version>
+        <crash-connectors.version>1.3.2</crash-connectors.version>
+        <cqengine.version>2.9.2</cqengine.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Startup class -->
+        <application.class>com.maxdemarzi.server.Server</application.class>
+    </properties>
+
+    <dependencies>
+        <!-- Data Structures -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.cqengine</groupId>
+            <artifactId>cqengine</artifactId>
+            <version>${cqengine.version}</version>
+        </dependency>
+
+        <!-- Server -->
+        <dependency>
+            <groupId>org.jooby</groupId>
+            <artifactId>jooby-netty</artifactId>
+            <version>${jooby.version}</version>
+        </dependency>
+
+        <!-- Render -->
+        <dependency>
+            <groupId>org.jooby</groupId>
+            <artifactId>jooby-jackson</artifactId>
+            <version>${jooby.version}</version>
+        </dependency>
+
+        <!-- Errors -->
+        <dependency>
+            <groupId>org.jooby</groupId>
+            <artifactId>jooby-whoops</artifactId>
+            <version>${jooby.version}</version>
+        </dependency>
+
+        <!-- Logging -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+
+        <!-- Swagger Documentation -->
+        <dependency>
+            <groupId>org.jooby</groupId>
+            <artifactId>jooby-swagger</artifactId>
+            <version>${jooby.version}</version>
+        </dependency>
+
+        <!-- Metrics -->
+        <dependency>
+            <groupId>org.jooby</groupId>
+            <artifactId>jooby-metrics</artifactId>
+            <version>${jooby.version}</version>
+        </dependency>
+
+        <!-- Templates -->
+        <dependency>
+            <groupId>org.jooby</groupId>
+            <artifactId>jooby-ftl</artifactId>
+            <version>${jooby.version}</version>
+        </dependency>
+
+        <!-- Shell -->
+        <dependency>
+            <groupId>org.jooby</groupId>
+            <artifactId>jooby-crash</artifactId>
+            <version>${jooby.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jooby</groupId>
+            <artifactId>jooby-banner</artifactId>
+            <version>${jooby.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.crashub</groupId>
+            <artifactId>crash.connectors.ssh</artifactId>
+            <version>${crash-connectors.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.crashub</groupId>
+            <artifactId>crash.connectors.web</artifactId>
+            <version>${crash-connectors.version}</version>
+        </dependency>
+
+
+        <!-- Tests -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <scope>test</scope>
+            <version>${jmh.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-generator-annprocess</artifactId>
+            <scope>test</scope>
+            <version>${jmh.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>${restassured.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>cmd</directory>
+            </resource>
+        </resources>
+        <plugins>
+            <!-- Build fat jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.jooby</groupId>
+                <artifactId>jooby-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>spec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler.version}</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>${coveralls.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
