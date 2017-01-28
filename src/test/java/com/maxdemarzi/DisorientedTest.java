@@ -34,8 +34,8 @@ public class DisorientedTest {
         HashMap<String, Object> properties = new HashMap<>();
         properties.put("stars", 5);
         db.addRelationship("RATED", "one", "two", properties);
-        Object actual = db.getRelationship("RATED", "one", "two");
-        Assert.assertEquals(properties, actual);
+        HashMap<String, Object> actual = db.getRelationship("RATED", "one", "two");
+        Assert.assertEquals(properties.get("stars"), actual.get("stars"));
         Assert.assertEquals(1, db.getRelationshipTypeAttributes("RATED").get("RATED"));
     }
 
@@ -55,17 +55,23 @@ public class DisorientedTest {
 
     @Test
     public void shouldAddNode() {
-        boolean created = db.addNode("key");
+        boolean created = db.addNode("User", "key");
         Assert.assertTrue(created);
-        Assert.assertEquals(new HashMap<>(), db.getNode("key"));
+        HashMap<String, Object> properties = new HashMap<>();
+        properties.put("_id", "key");
+        properties.put("_type", "User");
+        Assert.assertEquals(properties, db.getNode("key"));
     }
 
     @Test
     public void shouldNotAddNodeAlreadyThere() {
-        boolean created = db.addNode("key");
+        boolean created = db.addNode("User", "key");
         Assert.assertTrue(created);
-        Assert.assertEquals(new HashMap<>(), db.getNode("key"));
-        created = db.addNode("key");
+        HashMap<String, Object> properties = new HashMap<>();
+        properties.put("_id", "key");
+        properties.put("_type", "User");
+        Assert.assertEquals(properties, db.getNode("key"));
+        created = db.addNode("User", "key");
         Assert.assertFalse(created);
     }
 
@@ -74,16 +80,23 @@ public class DisorientedTest {
         HashMap<String, Object> properties = new HashMap<>();
         properties.put("name", "max");
         properties.put("email", "maxdemarzi@hotmail.com");
-        boolean created = db.addNode("max", properties);
+        boolean created = db.addNode("User", "max", properties);
+        properties.put("_id", "max");
+        properties.put("_type", "User");
         Assert.assertTrue(created);
         Assert.assertEquals(properties, db.getNode("max"));
     }
 
     @Test
     public void shouldAddNodeWithSimpleProperty() {
-        boolean created = db.addNode("simple", 5);
+        boolean created = db.addNode("User", "simple", 5);
         Assert.assertTrue(created);
-        Assert.assertEquals(new HashMap<String, Object>(){{put("value", 5);}}, db.getNode("simple"));
+        HashMap<String, Object> properties = new HashMap<>();
+        properties.put("_id", "simple");
+        properties.put("_type", "User");
+        properties.put("value", 5);
+
+        Assert.assertEquals(properties, db.getNode("simple"));
     }
 
     @Test
@@ -95,7 +108,7 @@ public class DisorientedTest {
 
     @Test
     public void shouldRemoveNode() {
-        boolean result = db.addNode("simple", 5);
+        boolean result = db.addNode("User", "simple", 5);
         Assert.assertTrue(result);
         result = db.removeNode("simple");
         Assert.assertTrue(result);
@@ -103,9 +116,9 @@ public class DisorientedTest {
 
     @Test
     public void shouldRemoveNodeRelationships() {
-        db.addNode("one");
-        db.addNode("two");
-        db.addNode("three");
+        db.addNode("User", "one");
+        db.addNode("User", "two");
+        db.addNode("User", "three");
         db.addRelationship("FRIENDS", "one", "two", 9);
         db.addRelationship("FRIENDS", "three", "one", 10);
 
@@ -129,8 +142,10 @@ public class DisorientedTest {
         properties.put("name", "max");
         properties.put("email", "maxdemarzi@hotmail.com");
         properties.put("address", address);
-        boolean created = db.addNode("complex", properties);
+        boolean created = db.addNode("User", "complex", properties);
         Assert.assertTrue(created);
+        properties.put("_id", "complex");
+        properties.put("_type", "User");
         Assert.assertEquals(properties, db.getNode("complex"));
     }
 
@@ -143,9 +158,9 @@ public class DisorientedTest {
 
     @Test
     public void shouldGetNodeOutgoingRelationshipNodeIds() {
-        db.addNode("one");
-        db.addNode("two");
-        db.addNode("three");
+        db.addNode("User", "one");
+        db.addNode("User", "two");
+        db.addNode("User", "three");
         db.addRelationship("FRIENDS", "one", "two");
         db.addRelationship("FRIENDS", "one", "three");
         HashSet<String> actual = db.getOutgoingRelationshipNodeIds("FRIENDS", "one");
@@ -154,9 +169,9 @@ public class DisorientedTest {
 
     @Test
     public void shouldGetNodeIncomingRelationshipNodeIds() {
-        db.addNode("one");
-        db.addNode("two");
-        db.addNode("three");
+        db.addNode("User", "one");
+        db.addNode("User", "two");
+        db.addNode("User", "three");
         db.addRelationship("FRIENDS", "one", "two");
         db.addRelationship("FRIENDS", "one", "three");
         HashSet<String> actual = db.getIncomingRelationshipNodeIds("FRIENDS", "two");
@@ -165,24 +180,28 @@ public class DisorientedTest {
 
     @Test
     public void shouldGetNodeOutgoingRelationshipNodes() {
-        db.addNode("one", 1);
-        db.addNode("two", "node two");
+        db.addNode("User", "one", 1);
+        db.addNode("User", "two", "node two");
 
         HashMap<String, Object> node3props = new HashMap<> ();
         node3props.put("property1", 3);
-        db.addNode("three", node3props);
+        db.addNode("User", "three", node3props);
 
         db.addRelationship("FRIENDS", "one", "two");
         db.addRelationship("FRIENDS", "one", "three");
         Set<Object> actual = db.getOutgoingRelationshipNodes("FRIENDS", "one");
+        node3props.put("_id", "three");
+        node3props.put("_type", "User");
 
         Set<Object> expected = new HashSet<Object>() {{
             add( new HashMap<String, Object>() {{
-                put("_id", "two");
-                put("properties", new HashMap<String, Object>(){{put("value", "node two");}});
+                put("properties", new HashMap<String, Object>(){{
+                    put("_id", "two");
+                    put("_type", "User");
+                    put("value", "node two");
+                }});
             }});
             add( new HashMap<String, Object>() {{
-                put("_id", "three");
                 put("properties", node3props);
             }});
         }};
@@ -191,24 +210,27 @@ public class DisorientedTest {
 
     @Test
     public void shouldGetNodeIncomingRelationshipNodes() {
-        db.addNode("one", 1);
-        db.addNode("two", "node two");
+        db.addNode("User", "one", 1);
+        db.addNode("User", "two", "node two");
 
         HashMap<String, Object> node3props = new HashMap<> ();
         node3props.put("property1", 3);
-        db.addNode("three", node3props);
+        db.addNode("User", "three", node3props);
 
         db.addRelationship("FRIENDS", "two", "one");
         db.addRelationship("FRIENDS", "three", "one");
         Set<Object> actual = db.getIncomingRelationshipNodes("FRIENDS", "one");
-
+        node3props.put("_id", "three");
+        node3props.put("_type", "User");
         Set<Object> expected = new HashSet<Object>() {{
             add( new HashMap<String, Object>() {{
-                put("_id", "two");
-                put("properties", new HashMap<String, Object>(){{put("value", "node two");}});
+
+                put("properties", new HashMap<String, Object>(){{
+                    put("_id", "two");
+                    put("_type", "User");
+                    put("value", "node two");}});
             }});
             add( new HashMap<String, Object>() {{
-                put("_id", "three");
                 put("properties", node3props);
             }});
         }};
@@ -217,9 +239,9 @@ public class DisorientedTest {
 
     @Test
     public void shouldGetNodeDegree() {
-        db.addNode("four");
-        db.addNode("five");
-        db.addNode("six");
+        db.addNode("User", "four");
+        db.addNode("User", "five");
+        db.addNode("User", "six");
         db.addRelationship("FRIENDS", "four", "five");
         db.addRelationship("ENEMIES", "four", "six");
         Integer actual = db.getNodeDegree("four");
@@ -228,9 +250,9 @@ public class DisorientedTest {
 
     @Test
     public void shouldGetNodeIncomingDegree() {
-        db.addNode("four");
-        db.addNode("five");
-        db.addNode("six");
+        db.addNode("User", "four");
+        db.addNode("User", "five");
+        db.addNode("User", "six");
         db.addRelationship("FRIENDS", "four", "five");
         db.addRelationship("ENEMIES", "six", "four");
         Integer actual = db.getNodeDegree("four", "out");
@@ -239,9 +261,9 @@ public class DisorientedTest {
 
     @Test
     public void shouldGetNodeOutgoingDegree() {
-        db.addNode("four");
-        db.addNode("five");
-        db.addNode("six");
+        db.addNode("User", "four");
+        db.addNode("User", "five");
+        db.addNode("User", "six");
         db.addRelationship("FRIENDS", "four", "five");
         db.addRelationship("ENEMIES", "six", "four");
         Integer actual = db.getNodeDegree("four", "out");
@@ -250,9 +272,9 @@ public class DisorientedTest {
 
     @Test
     public void shouldGetNodeIncomingTypedDegree() {
-        db.addNode("four");
-        db.addNode("five");
-        db.addNode("six");
+        db.addNode("User", "four");
+        db.addNode("User", "five");
+        db.addNode("User", "six");
         db.addRelationship("FRIENDS", "five", "four");
         db.addRelationship("ENEMIES", "six", "four");
         Integer actual = db.getNodeDegree("four", "in", new ArrayList<String>(){{add("ENEMIES");}});
@@ -261,9 +283,9 @@ public class DisorientedTest {
 
     @Test
     public void shouldGetNodeOutgoingTypedDegree() {
-        db.addNode("four");
-        db.addNode("five");
-        db.addNode("six");
+        db.addNode("User", "four");
+        db.addNode("User", "five");
+        db.addNode("User", "six");
         db.addRelationship("FRIENDS", "four", "five");
         db.addRelationship("ENEMIES", "four", "six");
         Integer actual = db.getNodeDegree("four", "out", new ArrayList<String>(){{add("ENEMIES");}});

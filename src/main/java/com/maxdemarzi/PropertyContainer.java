@@ -9,22 +9,32 @@ import static com.googlecode.cqengine.query.QueryFactory.attribute;
 
 public class PropertyContainer {
 
+    private final String type;
     private final String id;
     private final HashMap<String, Object> properties;
 
-    public PropertyContainer(String id, HashMap<String, Object> properties) {
+    public PropertyContainer(String type, String id, HashMap<String, Object> properties) {
         this.id = id;
+        this.type = type;
         this.properties = properties;
     }
 
-    public static final Attribute<PropertyContainer, String> ID = attribute("id", PropertyContainer::getId);
+    public static final Attribute<PropertyContainer, String> TYPE = attribute("_type", PropertyContainer::getType);
+    public static final Attribute<PropertyContainer, String> ID = attribute("_id", PropertyContainer::getId);
 
     public String getId() {
         return id;
     }
+    public String getType() {
+        return type;
+    }
 
     public HashMap<String, Object> getProperties() {
-        return properties;
+        HashMap<String, Object> node = new HashMap<>();
+        node.putAll(properties);
+        node.put("_id", id);
+        node.put("_type", type);
+        return node;
     }
 
     public Object getProperty(String key) {

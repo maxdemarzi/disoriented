@@ -3,6 +3,7 @@ package com.maxdemarzi;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.ObjectLockingIndexedCollection;
+import com.googlecode.cqengine.index.hash.HashIndex;
 import com.googlecode.cqengine.index.unique.UniqueIndex;
 import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.resultset.ResultSet;
@@ -46,7 +47,9 @@ public class Disoriented {
 
     private Disoriented() {
         nodes.addIndex(UniqueIndex.onAttribute(PropertyContainer.ID));
+        nodes.addIndex(HashIndex.onAttribute(PropertyContainer.TYPE));
         relationships.addIndex(UniqueIndex.onAttribute(PropertyContainer.ID));
+        relationships.addIndex(HashIndex.onAttribute(PropertyContainer.TYPE));
         related = new HashMap<>();
     }
 
@@ -62,67 +65,67 @@ public class Disoriented {
         return new ArrayList<>(related.keySet());
     }
 
-    public boolean addNode (String id) {
+    public boolean addNode (String type, String id) {
         final Query<PropertyContainer> query = equal(PropertyContainer.ID, id);
         if (nodes.retrieve(query).isNotEmpty()) {
             return false;
         } else {
-            nodes.add(new PropertyContainer(id, new HashMap<>()));
+            nodes.add(new PropertyContainer(type, id, new HashMap<>()));
         }
         return true;
 
     }
 
-    public boolean addNode (String id, String properties)  {
+    public boolean addNode (String type, String id, String properties)  {
         final Query<PropertyContainer> query = equal(PropertyContainer.ID, id);
          if (nodes.retrieve(query).isNotEmpty()) {
             return false;
         } else {
             try {
-                nodes.add(new PropertyContainer(id, mapper.readValue(properties, HashMap.class)));
+                nodes.add(new PropertyContainer(type, id, mapper.readValue(properties, HashMap.class)));
             } catch (IOException e) {
                 HashMap<String, Object> value = new HashMap<>();
                 value.put("value", properties);
-                nodes.add(new PropertyContainer(id, value));
+                nodes.add(new PropertyContainer(type, id, value));
             }
             return true;
         }
     }
 
-    public boolean addNode (String id, HashMap properties)  {
+    public boolean addNode (String type, String id, HashMap properties)  {
         final Query<PropertyContainer> query = equal(PropertyContainer.ID, id);
         if (nodes.retrieve(query).isNotEmpty()) {
         return false;
         } else {
-             nodes.add(new PropertyContainer(id, properties));
+             nodes.add(new PropertyContainer(type, id, properties));
             return true;
         }
     }
 
-    public boolean addNode (String id, Object value)  {
+    public boolean addNode (String type, String id, Object value)  {
         final Query<PropertyContainer> query = equal(PropertyContainer.ID, id);
         if (nodes.retrieve(query).isNotEmpty()) {
             return false;
         } else {
             HashMap<String, Object> properties = new HashMap<>();
             properties.put("value", value);
-            nodes.add(new PropertyContainer(id, properties));
+            nodes.add(new PropertyContainer(type, id, properties));
             return true;
         }
     }
 
     public boolean updateNode (String id, String value)  {
          final Query<PropertyContainer> query = equal(PropertyContainer.ID, id);
-        ResultSet<PropertyContainer> results = nodes.retrieve(query);
+         ResultSet<PropertyContainer> results = nodes.retrieve(query);
          if (results.isNotEmpty()) {
              PropertyContainer node = results.uniqueResult();
              nodes.remove(node);
              try {
-                nodes.add(new PropertyContainer(id, mapper.readValue(value, HashMap.class)));
+                nodes.add(new PropertyContainer(node.getType(), id, mapper.readValue(value, HashMap.class)));
             } catch (IOException e) {
                 HashMap<String, Object> properties = new HashMap<>();
                 properties.put("value", value);
-                nodes.add(new PropertyContainer(id, properties));
+                nodes.add(new PropertyContainer(node.getType(), id, properties));
             }
             return true;
 
@@ -137,7 +140,7 @@ public class Disoriented {
          if (nodes.retrieve(query).isNotEmpty()) {
              PropertyContainer node = results.uniqueResult();
              nodes.remove(node);
-             nodes.add(new PropertyContainer(id, properties));
+             nodes.add(new PropertyContainer(node.getType(), id, properties));
             return true;
         } else {
             return false;
@@ -166,12 +169,12 @@ public class Disoriented {
             for (String type : related.keySet()) {
                 ReversibleMultiMap<String, String> rels = related.get(type);
                 for (String value : rels.get(id)) {
-                    query = equal(PropertyContainer.ID, id + "-" + value + type);
+                    query = equal(PropertyContainer.ID, id + "-" + value + "-" + type);
                     results = relationships.retrieve(query);
                     relationships.remove(results.uniqueResult());
                 }
                 for (String key : rels.getKeysByValue(id)) {
-                    query = equal(PropertyContainer.ID, key + "-" + id + type);
+                    query = equal(PropertyContainer.ID, key + "-" + id + "-" + type);
                     results = relationships.retrieve(query);
                     relationships.remove(results.uniqueResult());
                 }
@@ -190,18 +193,18 @@ public class Disoriented {
 
     public boolean addRelationship (String type, String from, String to, String properties)  {
         try {
-            relationships.add(new PropertyContainer(from + "-" + to + type, mapper.readValue(properties, HashMap.class)));
+            relationships.add(new PropertyContainer(type, from + "-" + to + "-" + type, mapper.readValue(properties, HashMap.class)));
         } catch (IOException e) {
             HashMap<String, Object> value = new HashMap<>();
             value.put("value", properties);
-            relationships.add(new PropertyContainer(from + "-" + to + type, value));
+            relationships.add(new PropertyContainer(type, from + "-" + to + "-" + type, value));
         }
         related.putIfAbsent(type, new ReversibleMultiMap<>());
         return related.get(type).put(from, to);
     }
 
     public boolean addRelationship (String type, String from, String to, HashMap properties) {
-        relationships.add(new PropertyContainer(from + "-" + to + type, properties));
+        relationships.add(new PropertyContainer(type, from + "-" + to + "-" + type, properties));
         related.putIfAbsent(type, new ReversibleMultiMap<>());
         return related.get(type).put(from, to);
     }
@@ -209,13 +212,13 @@ public class Disoriented {
     public boolean addRelationship (String type, String from, String to, Object properties) {
         HashMap<String, Object> value = new HashMap<>();
         value.put("value", properties);
-        relationships.add(new PropertyContainer(from + "-" + to + type, value));
+        relationships.add(new PropertyContainer(type, from + "-" + to + "-" + type, value));
         related.putIfAbsent(type, new ReversibleMultiMap<>());
         return related.get(type).put(from, to); 
     }
 
     public HashMap<String, Object> getRelationship(String type, String from, String to) {
-        final Query<PropertyContainer> query = equal(PropertyContainer.ID, from + "-" + to + type);
+        final Query<PropertyContainer> query = equal(PropertyContainer.ID, from + "-" + to + "-" + type);
         ResultSet<PropertyContainer> results = relationships.retrieve(query);
         if (results.isEmpty()) {
             if (related.get(type).get(from).contains(to)) {
@@ -228,7 +231,7 @@ public class Disoriented {
     }
 
     public boolean updateRelationship(String type, String from, String to, String properties) {
-        final Query<PropertyContainer> query = equal(PropertyContainer.ID, from + "-" + to + type);
+        final Query<PropertyContainer> query = equal(PropertyContainer.ID, from + "-" + to + "-" + type);
         ResultSet<PropertyContainer> results = relationships.retrieve(query);
         if (results.isEmpty()){
             if (!related.get(type).get(from).contains(to)) {
@@ -238,17 +241,17 @@ public class Disoriented {
         PropertyContainer rel = results.uniqueResult();
         relationships.remove(rel);
         try {
-            relationships.add(new PropertyContainer(from + "-" + to + type, mapper.readValue(properties, HashMap.class)));
+            relationships.add(new PropertyContainer(type, from + "-" + to + "-" + type, mapper.readValue(properties, HashMap.class)));
         } catch (IOException e) {
             HashMap<String, Object> value = new HashMap<>();
             value.put("value", properties);
-            relationships.add(new PropertyContainer(from + "-" + to + type, value));
+            relationships.add(new PropertyContainer(type, from + "-" + to + "-" + type, value));
         }
         return true;
     }
 
     public boolean updateRelationship(String type, String from, String to, HashMap properties) {
-        final Query<PropertyContainer> query = equal(PropertyContainer.ID, from + "-" + to + type);
+        final Query<PropertyContainer> query = equal(PropertyContainer.ID, from + "-" + to + "-" + type);
         ResultSet<PropertyContainer> results = relationships.retrieve(query);
         if (results.isEmpty()){
             if (!related.get(type).get(from).contains(to)) {
@@ -257,12 +260,12 @@ public class Disoriented {
         }
         PropertyContainer rel = results.uniqueResult();
         relationships.remove(rel);
-        relationships.add(new PropertyContainer(from + "-" + to + type, properties));
+        relationships.add(new PropertyContainer(type, from + "-" + to + "-" + type, properties));
         return true;
     }
 
     public boolean deleteRelationshipProperties(String type, String from, String to) {
-        final Query<PropertyContainer> query = equal(PropertyContainer.ID, from + "-" + to + type);
+        final Query<PropertyContainer> query = equal(PropertyContainer.ID, from + "-" + to + "-" + type);
         ResultSet<PropertyContainer> results = relationships.retrieve(query);
         if (results.isEmpty()){
             if (!related.get(type).get(from).contains(to)) {
@@ -279,7 +282,7 @@ public class Disoriented {
             return false;
         }
         related.get(type).remove(from, to);
-        final Query<PropertyContainer> query = equal(PropertyContainer.ID, from + "-" + to + type);
+        final Query<PropertyContainer> query = equal(PropertyContainer.ID, from + "-" + to + "-" + type);
         ResultSet<PropertyContainer> results = relationships.retrieve(query);
         if (results.isNotEmpty()) {
             relationships.remove(results.uniqueResult());
@@ -299,7 +302,6 @@ public class Disoriented {
         Set<Object> results = new HashSet<>();
         for (String id : related.get(type).get(from) ) {
             HashMap<String, Object> properties = new HashMap<>();
-            properties.put("_id", id);
             properties.put("properties", getNode(id));
             results.add(properties);
         }
@@ -310,7 +312,6 @@ public class Disoriented {
         Set<Object> results = new HashSet<>();
         for (String id : related.get(type).getKeysByValue(from) ) {
             HashMap<String, Object> properties = new HashMap<>();
-            properties.put("_id", id);
             properties.put("properties", getNode(id));
             results.add(properties);
         }

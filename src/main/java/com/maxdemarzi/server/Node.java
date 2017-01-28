@@ -27,13 +27,15 @@ public class Node extends Jooby {
             })
             /*
              * Create a node with Properties
+             * @param type Node Type.
              * @param id Node ID.
              * @param body Node Properties. Default is "{}".
              * @return Returns <code>201</code>
              */
-            .post("/node/:id", (req, rsp) -> {
+            .post("/node/:type/:id", (req, rsp) -> {
                 String id = req.param("id").value();
-                Server.db.addNode(id, req.body().toOptional().orElse("{}"));
+                String type = req.param("type").value();
+                Server.db.addNode(type, id, req.body().toOptional().orElse("{}"));
                 rsp.status(201);
                 rsp.send(Server.db.getNode(id));
             })

@@ -29,9 +29,9 @@ public class RelationshipPropertiesTest {
         properties.put("stars", 5);
         properties.put("since", "2017-01-07");
 
-        db.addNode("node1");
-        db.addNode("node2");
-        db.addNode("node3");
+        db.addNode("User", "node1");
+        db.addNode("User", "node2");
+        db.addNode("User", "node3");
         db.addRelationship("FOLLOWS", "node1", "node2");
         db.addRelationship("FOLLOWS", "node1", "node3", properties);
     }
@@ -94,6 +94,8 @@ public class RelationshipPropertiesTest {
         properties.put("stars", 5);
         properties.put("since", "2017-01-07");
         properties.put("archived", true);
+        properties.put("_type", "FOLLOWS");
+        properties.put("_id", "node1-node3-FOLLOWS");
 
         given().
                 contentType("application/json").
@@ -117,6 +119,8 @@ public class RelationshipPropertiesTest {
         properties.put("stars", 4);
         properties.put("since", "2017-01-07");
         properties.put("archived", true);
+        properties.put("_id", "node1-node3-FOLLOWS");
+        properties.put("_type", "FOLLOWS");
 
         given().
                 contentType("application/json").

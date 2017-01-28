@@ -43,7 +43,7 @@ public class DisorientedBenchmark {
             HashMap<String, Object> properties = new HashMap<>();
             properties.put("id", item);
             properties.put("itemname", "itemname" + item );
-            db.addNode("item" + item, properties);
+            db.addNode("User", "item" + item, properties);
         }
 
         for (int person = 0; person < personCount; person++) {
@@ -61,7 +61,7 @@ public class DisorientedBenchmark {
     @BenchmarkMode(Mode.Throughput)
     @OutputTimeUnit(TimeUnit.SECONDS)
     public void measureCreateEmptyNode() throws IOException {
-        db.addNode("user" + rand.nextInt(userCount));
+        db.addNode("User", "user" + rand.nextInt(userCount));
     }
 
     @Benchmark
@@ -74,7 +74,7 @@ public class DisorientedBenchmark {
     public int measureCreateEmptyNodes() throws IOException {
         int user;
         for (user = 0; user < userCount; user++) {
-            db.addNode("user" + user);
+            db.addNode("User", "user" + user);
         }
         return user;
     }
@@ -93,7 +93,7 @@ public class DisorientedBenchmark {
             properties.put("username", "username" + rand.nextInt() );
             properties.put("age", + rand.nextInt(100) );
             properties.put("weight", rand.nextInt(300) );
-            db.addNode( String.valueOf(rand.nextInt()), properties);
+            db.addNode("User",  String.valueOf(rand.nextInt()), properties);
         }
         return user;
     }
@@ -110,7 +110,7 @@ public class DisorientedBenchmark {
         properties.put("username", "username" + rand.nextInt() );
         properties.put("age", + rand.nextInt(100) );
         properties.put("weight", rand.nextInt(300) );
-        db.addNode( String.valueOf(rand.nextInt()), properties);
+        db.addNode("User",  String.valueOf(rand.nextInt()), properties);
     }
 
     @Benchmark
@@ -123,7 +123,7 @@ public class DisorientedBenchmark {
     public int measureCreateEmptyNodesAndRelationships() throws IOException {
         int user;
         for (user = 0; user < userCount; user++) {
-            db.addNode("user" + user);
+            db.addNode("User", "user" + user);
         }
         for (user = 0; user < userCount; user++) {
             for (int like = 0; like < friendsCount; like++) {

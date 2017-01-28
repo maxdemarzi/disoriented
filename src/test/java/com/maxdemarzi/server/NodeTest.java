@@ -24,14 +24,14 @@ public class NodeTest {
     public void setup() throws IOException {
         db = Disoriented.getInstance();
         db.clear();
-        db.addNode("emptyNode");
+        db.addNode("User", "emptyNode");
         HashMap<String, Object> prop =  new HashMap<>();
         prop.put("property", "Value");
-        db.addNode("singlePropertyNode", prop);
+        db.addNode("User", "singlePropertyNode", prop);
         HashMap<String, Object> props =  new HashMap<>();
         props.put("city", "Chicago");
         props.put("prop", prop);
-        db.addNode("complexPropertiesNode", props);
+        db.addNode("User", "complexPropertiesNode", props);
     }
 
     @Test
@@ -45,11 +45,16 @@ public class NodeTest {
 
     @Test
     public void integrationTestGetEmptyNode() {
+
+        HashMap<String, Object> props =  new HashMap<>();
+        props.put("_id", "emptyNode");
+        props.put("_type", "User");
+
         when().
                 get("/db/node/emptyNode").
         then().
                 assertThat()
-                .body(equalTo("{}"))
+                .body("$", equalTo(props))
                 .statusCode(200)
                 .contentType("application/json;charset=UTF-8");
     }
@@ -59,11 +64,15 @@ public class NodeTest {
         HashMap<String, Object> prop =  new HashMap<>();
         prop.put("property", "Value");
 
+        HashMap<String, Object> props =  new HashMap<>();
+        props.put("property", "Value");
+        props.put("_id", "singlePropertyNode");
+        props.put("_type", "User");
         when().
                 get("/db/node/singlePropertyNode").
         then().
                 assertThat()
-                .body("$", equalTo(prop))
+                .body("$", equalTo(props))
                 .statusCode(200)
                 .contentType("application/json;charset=UTF-8");
     }
@@ -76,6 +85,8 @@ public class NodeTest {
         HashMap<String, Object> props =  new HashMap<>();
         props.put("city", "Chicago");
         props.put("prop", prop);
+        props.put("_id", "complexPropertiesNode");
+        props.put("_type", "User");
 
         when().
                 get("/db/node/complexPropertiesNode").
@@ -88,16 +99,19 @@ public class NodeTest {
 
     @Test
     public void integrationTestCreateEmptyNode() {
+        HashMap<String, Object> props =  new HashMap<>();
+        props.put("_id", "empty");
+        props.put("_type", "Empty");
         given().
                 contentType("application/json").
                 body("{}").
         when().
-                post("/db/node/emptyNode").
+                post("/db/node/Empty/empty").
         then().
                 assertThat().
-                body("$", equalTo(new HashMap<>())).
+                body("$", equalTo(props)).
                 statusCode(201).
-                contentType("application/json;charset=UTF-8");;
+                contentType("application/json;charset=UTF-8");
     }
 
     @Test
@@ -105,14 +119,19 @@ public class NodeTest {
         HashMap<String, Object> prop =  new HashMap<>();
         prop.put("property", "Value");
 
+        HashMap<String, Object> props =  new HashMap<>();
+        props.put("property", "Value");
+        props.put("_id", "singlePropertyNode");
+        props.put("_type", "User");
+
         given().
                 contentType("application/json").
                 body(prop).
         when().
-                post("/db/node/singlePropertyNode").
+                post("/db/node/User/singlePropertyNode").
         then().
                 assertThat().
-                body("$", equalTo(prop)).
+                body("$", equalTo(props)).
                 statusCode(201).
                 contentType("application/json;charset=UTF-8");
     }
@@ -125,12 +144,14 @@ public class NodeTest {
         HashMap<String, Object> props =  new HashMap<>();
         props.put("city", "Chicago");
         props.put("prop", prop);
+        props.put("_id", "complexPropertiesNode");
+        props.put("_type", "User");
 
         given().
                 contentType("application/json").
                 body(props).
         when().
-                post("/db/node/complexPropertiesNode").
+                post("/db/node/User/complexPropertiesNode").
         then().
                 assertThat().
                 body("$", equalTo(props)).
@@ -151,6 +172,11 @@ public class NodeTest {
         HashMap<String, Object> prop =  new HashMap<>();
         prop.put("property", "Value2");
 
+        HashMap<String, Object> properties = new HashMap<>();
+        properties.put("property", "Value2");
+        properties.put("_id", "singlePropertyNode");
+        properties.put("_type", "User");
+
         given().
                 contentType("application/json").
                 body(prop).
@@ -158,7 +184,7 @@ public class NodeTest {
                 put("/db/node/singlePropertyNode").
         then().
                 assertThat().
-                body("$", equalTo(prop)).
+                body("$", equalTo(properties)).
                 statusCode(201).
                 contentType("application/json;charset=UTF-8");
     }
@@ -171,6 +197,8 @@ public class NodeTest {
         HashMap<String, Object> props =  new HashMap<>();
         props.put("city", "Miami");
         props.put("prop", prop);
+        props.put("_id", "complexPropertiesNode");
+        props.put("_type", "User");
 
         given().
                 contentType("application/json").

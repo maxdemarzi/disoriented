@@ -28,9 +28,9 @@ public class RelationshipTest {
         HashMap<String, Object> properties = new HashMap<>();
         properties.put("stars", 5);
 
-        db.addNode("node1");
-        db.addNode("node2");
-        db.addNode("node3");
+        db.addNode("User", "node1");
+        db.addNode("User", "node2");
+        db.addNode("User", "node3");
         db.addRelationship("FOLLOWS", "node1", "node2");
         db.addRelationship("FOLLOWS", "node1", "node3", properties);
     }
@@ -60,24 +60,33 @@ public class RelationshipTest {
         HashMap<String, Object> prop =  new HashMap<>();
         prop.put("stars", 5);
 
+        HashMap<String, Object> properties = new HashMap<>();
+        properties.put("stars", 5);
+        properties.put("_id", "node1-node3-FOLLOWS");
+        properties.put("_type", "FOLLOWS");
+
         when().
                 get("/db/relationship/FOLLOWS/node1/node3").
         then().
                 assertThat().
-                body("$", equalTo(prop)).
+                body("$", equalTo(properties)).
                 statusCode(200).
                 contentType("application/json;charset=UTF-8");
     }
 
     @Test
     public void integrationTestCreateEmptyRelationship() {
+        HashMap<String, Object> properties = new HashMap<>();
+        properties.put("_id", "node2-node1-FOLLOWS");
+        properties.put("_type", "FOLLOWS");
+
         given().
                 contentType("application/json").
         when().
                 post("/db/relationship/FOLLOWS/node2/node1").
         then().
                 assertThat().
-                body("$", equalTo(new HashMap<>())).
+                body("$", equalTo(properties)).
                 statusCode(201).
                 contentType("application/json;charset=UTF-8");
     }
@@ -87,6 +96,11 @@ public class RelationshipTest {
         HashMap<String, Object> prop =  new HashMap<>();
         prop.put("stars", 5);
 
+        HashMap<String, Object> properties = new HashMap<>();
+        properties.put("stars", 5);
+        properties.put("_id", "node1-node3-FOLLOWS");
+        properties.put("_type", "FOLLOWS");
+
         given().
                 contentType("application/json").
                 body(prop).
@@ -94,7 +108,7 @@ public class RelationshipTest {
                 post("/db/relationship/FOLLOWS/node1/node3").
         then().
                 assertThat().
-                body("$", equalTo(prop)).
+                body("$", equalTo(properties)).
                 statusCode(201).
                 contentType("application/json;charset=UTF-8");
     }

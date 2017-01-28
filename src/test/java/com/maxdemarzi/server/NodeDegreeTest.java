@@ -26,9 +26,9 @@ public class NodeDegreeTest {
         HashMap<String, Object> properties = new HashMap<>();
         properties.put("stars", 5);
 
-        db.addNode("node1");
-        db.addNode("node2");
-        db.addNode("node3");
+        db.addNode("User", "node1");
+        db.addNode("User", "node2");
+        db.addNode("User", "node3");
         db.addRelationship("FOLLOWS", "node1", "node2");
         db.addRelationship("FOLLOWS", "node1", "node3", properties);
     }

@@ -28,7 +28,7 @@ public class CQEngineTest {
         HashMap<String, Object> properties = new HashMap<>();
         properties.put("name", "Max");
         String id = "max";
-        PropertyContainer node =new PropertyContainer(id , properties);
+        PropertyContainer node = new PropertyContainer("User", id , properties);
         nodes.add(node);
         Query<PropertyContainer> query = equal(PropertyContainer.ID, id);
         ResultSet<PropertyContainer> results = nodes.retrieve(query);
@@ -41,7 +41,7 @@ public class CQEngineTest {
         HashMap<String, Object> properties = new HashMap<>();
         properties.put("name", "Max");
         String id = "max";
-        PropertyContainer node =new PropertyContainer(id , properties);
+        PropertyContainer node = new PropertyContainer("User", id , properties);
         nodes.add(node);
         nodes.addIndex(UniqueIndex.onAttribute(PropertyContainer.ID));
         Query<PropertyContainer> query = equal(PropertyContainer.ID, id);
@@ -57,7 +57,7 @@ public class CQEngineTest {
             HashMap<String, Object> properties = new HashMap<>();
             properties.put("id" + person, "id" + person);
             properties.put("age", rand.nextInt(120));
-            nodes.add(new PropertyContainer("id" + person, properties));
+            nodes.add(new PropertyContainer("User", "id" + person, properties));
         }
 
         Class<? extends SimpleNullableAttribute<PropertyContainer, Integer>> attributeClass =

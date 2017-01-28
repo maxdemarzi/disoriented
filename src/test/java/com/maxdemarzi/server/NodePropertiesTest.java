@@ -28,9 +28,9 @@ public class NodePropertiesTest {
         properties.put("name", "Max");
         properties.put("age", 37);
 
-        db.addNode("node1", properties);
-        db.addNode("node2");
-        db.addNode("node3");
+        db.addNode("User", "node1", properties);
+        db.addNode("User", "node2");
+        db.addNode("User", "node3");
         db.addRelationship("FOLLOWS", "node1", "node2");
         db.addRelationship("FOLLOWS", "node1", "node3");
     }
@@ -93,6 +93,8 @@ public class NodePropertiesTest {
         properties.put("name", "Max");
         properties.put("age", 37);
         properties.put("weight", 200);
+        properties.put("_id", "node1");
+        properties.put("_type", "User");
 
         given().
                 contentType("application/json").
@@ -116,6 +118,8 @@ public class NodePropertiesTest {
         properties.put("name", "Max");
         properties.put("age", 38);
         properties.put("weight", 200);
+        properties.put("_id", "node1");
+        properties.put("_type", "User");
 
         given().
                 contentType("application/json").

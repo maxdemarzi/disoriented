@@ -36,7 +36,7 @@ public class DisorientedRecommendationBenchmark {
             HashMap<String, Object> properties = new HashMap<>();
             properties.put("id", item);
             properties.put("itemname", "itemname" + item );
-            db.addNode("item" + item, properties);
+            db.addNode("User", "item" + item, properties);
         }
 
         for (int person = 0; person < personCount; person++) {
