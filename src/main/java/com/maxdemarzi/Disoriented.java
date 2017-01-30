@@ -3,6 +3,7 @@ package com.maxdemarzi;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.ObjectLockingIndexedCollection;
+import com.googlecode.cqengine.index.Index;
 import com.googlecode.cqengine.index.hash.HashIndex;
 import com.googlecode.cqengine.index.unique.UniqueIndex;
 import com.googlecode.cqengine.query.Query;
@@ -17,6 +18,7 @@ public class Disoriented {
 
     private static IndexedCollection<PropertyContainer> nodes = new ObjectLockingIndexedCollection<>();
     private static IndexedCollection<PropertyContainer> relationships = new ObjectLockingIndexedCollection<>();
+    private static HashMap<String, Set<String>> indexes = new HashMap<>();
     private static HashMap<String, ReversibleMultiMap<String, String>> related;
     private static final ObjectMapper mapper = new ObjectMapper();
     private static Disoriented instance;
@@ -47,7 +49,9 @@ public class Disoriented {
 
     private Disoriented() {
         nodes.addIndex(UniqueIndex.onAttribute(PropertyContainer.ID));
+        indexes.put("_id", new HashSet<String>(){{add("UniqueIndex");}});
         nodes.addIndex(HashIndex.onAttribute(PropertyContainer.TYPE));
+        indexes.put("_type", new HashSet<String>(){{add("HashIndex");}});
         relationships.addIndex(UniqueIndex.onAttribute(PropertyContainer.ID));
         relationships.addIndex(HashIndex.onAttribute(PropertyContainer.TYPE));
         related = new HashMap<>();
@@ -63,6 +67,16 @@ public class Disoriented {
 
     public List<String> getRelationshipTypes() {
         return new ArrayList<>(related.keySet());
+    }
+
+    public HashMap<String, Set<String>> getIndexes() {
+        return indexes;
+    }
+
+    public boolean addNodeIndex(Index<PropertyContainer> index, String property) {
+        nodes.addIndex(index);
+        indexes.get(property).add(index.toString());
+        return true;
     }
 
     public boolean addNode (String type, String id) {

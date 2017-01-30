@@ -50,6 +50,7 @@ public class Server extends Jooby {
         use(new NodeProperties());
         use(new Relationship());
         use(new RelationshipProperties());
+        use(new Index());
 
         use("/db")
                 /*

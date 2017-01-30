@@ -45,6 +45,21 @@ public class PropertyContainer {
         return (Integer)properties.get(key);
     }
 
+    public Long getLongProperty(String key) {
+        return (Long) properties.get(key);
+    }
+
+    public String getStringProperty(String key) {
+        return (String) properties.get(key);
+    }
+
+    public Float getFloatProperty(String key) {
+        return (Float)properties.get(key);
+    }
+
+    public Double getDoubleProperty(String key) {
+        return (Double) properties.get(key);
+    }
 
     @Override
     public boolean equals(Object o) {
