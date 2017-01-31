@@ -11,8 +11,8 @@ import java.util.Set;
 
 public class ReversibleMultiMap<K extends String, V extends String> implements Multimap<K, V> {
 
-        private SortedSetMultimap<K, V> key2Value = TreeMultimap.create();
-        private SortedSetMultimap<V, K> value2key = TreeMultimap.create();
+        private ListMultimap<K, V> key2Value = ArrayListMultimap.create();
+        private ListMultimap<V, K> value2key = ArrayListMultimap.create();
 
         public Collection<K> getKeysByValue(V value) {
             return value2key.get(value);
@@ -45,60 +45,60 @@ public class ReversibleMultiMap<K extends String, V extends String> implements M
 
         @Override
         public boolean put(K key, V value) {
-            Multimaps.synchronizedSortedSetMultimap(value2key).put(value, key);
-            return Multimaps.synchronizedSortedSetMultimap(key2Value).put(key, value);
+            Multimaps.synchronizedListMultimap(value2key).put(value, key);
+            return Multimaps.synchronizedListMultimap(key2Value).put(key, value);
         }
 
         @Override
         public boolean remove(Object key, Object value) {
-            Multimaps.synchronizedSortedSetMultimap(value2key).remove(value, key);
-            return Multimaps.synchronizedSortedSetMultimap(key2Value).remove(key, value);
+            Multimaps.synchronizedListMultimap(value2key).remove(value, key);
+            return Multimaps.synchronizedListMultimap(key2Value).remove(key, value);
         }
 
         @Override
         public boolean putAll(K key, Iterable<? extends V> values) {
             for (V value : values) {
-                Multimaps.synchronizedSortedSetMultimap(value2key).put(value, key);
+                Multimaps.synchronizedListMultimap(value2key).put(value, key);
             }
-            return Multimaps.synchronizedSortedSetMultimap(key2Value).putAll(key, values);
+            return Multimaps.synchronizedListMultimap(key2Value).putAll(key, values);
         }
 
         @Override
         public boolean putAll(Multimap<? extends K, ? extends V> multimap) {
             for (Entry<? extends K, ? extends V> e : multimap.entries()) {
-                Multimaps.synchronizedSortedSetMultimap(value2key).put(e.getValue(), e.getKey());
+                Multimaps.synchronizedListMultimap(value2key).put(e.getValue(), e.getKey());
             }
-            return Multimaps.synchronizedSortedSetMultimap(key2Value).putAll(multimap);
+            return Multimaps.synchronizedListMultimap(key2Value).putAll(multimap);
         }
 
         @Override
         public Collection<V> replaceValues(K key, Iterable<? extends V> values) {
-            Collection<V> replaced = Multimaps.synchronizedSortedSetMultimap(key2Value).replaceValues(key, values);
+            Collection<V> replaced = Multimaps.synchronizedListMultimap(key2Value).replaceValues(key, values);
             for (V value : replaced) {
-                Multimaps.synchronizedSortedSetMultimap(value2key).remove(value, key);
+                Multimaps.synchronizedListMultimap(value2key).remove(value, key);
             }
             for (V value : values) {
-                Multimaps.synchronizedSortedSetMultimap(value2key).put(value, key);
+                Multimaps.synchronizedListMultimap(value2key).put(value, key);
             }
             return replaced;
         }
 
         @Override
         public Collection<V> removeAll(Object key) {
-            Collection<V> removed = Multimaps.synchronizedSortedSetMultimap(key2Value).removeAll(key);
+            Collection<V> removed = Multimaps.synchronizedListMultimap(key2Value).removeAll(key);
             for (V value : removed) {
-                Multimaps.synchronizedSortedSetMultimap(value2key).remove(value, key);
+                Multimaps.synchronizedListMultimap(value2key).remove(value, key);
             }
-            for (K reverse : Multimaps.synchronizedSortedSetMultimap(value2key).removeAll(key)){
-                Multimaps.synchronizedSortedSetMultimap(key2Value).remove(reverse, key);
+            for (K reverse : Multimaps.synchronizedListMultimap(value2key).removeAll(key)){
+                Multimaps.synchronizedListMultimap(key2Value).remove(reverse, key);
             }
             return removed;
         }
 
         @Override
         public void clear() {
-            Multimaps.synchronizedSortedSetMultimap(value2key).clear();
-            Multimaps.synchronizedSortedSetMultimap(key2Value).clear();
+            Multimaps.synchronizedListMultimap(value2key).clear();
+            Multimaps.synchronizedListMultimap(key2Value).clear();
         }
 
         @Override
