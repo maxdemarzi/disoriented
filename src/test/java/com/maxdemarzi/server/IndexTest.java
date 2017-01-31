@@ -58,7 +58,7 @@ public class IndexTest {
     }
 
     @Test
-    public void integrationTestPostNodeIndex() {
+    public void integrationTestPostNodeIntegerIndex() {
         when().
                 post("/db/index/node/navigable/integer/birth_year").
         then().
@@ -67,10 +67,28 @@ public class IndexTest {
     }
 
     @Test
-    public void integrationTestPostRelationshipIndex() {
+    public void integrationTestPostNodeFloatIndex() {
         when().
-                post("/db/index/relationship/hash/integer/rating").
-        then().
+                post("/db/index/node/navigable/float/radius").
+                then().
+                assertThat().
+                statusCode(201);
+    }
+
+    @Test
+    public void integrationTestPostNodeDoubleIndex() {
+        when().
+                post("/db/index/node/navigable/double/amount").
+                then().
+                assertThat().
+                statusCode(201);
+    }
+
+    @Test
+    public void integrationTestPostNodeStringIndex() {
+        when().
+                post("/db/index/node/navigable/double/first_name").
+                then().
                 assertThat().
                 statusCode(201);
     }
@@ -83,4 +101,50 @@ public class IndexTest {
                 assertThat().
                 statusCode(201);
     }
+
+    @Test
+    public void integrationTestPostRelationshipIntegerIndex() {
+        when().
+                post("/db/index/relationship/hash/integer/rating").
+        then().
+                assertThat().
+                statusCode(201);
+    }
+
+    @Test
+    public void integrationTestPostRelationshipFloatIndex() {
+        when().
+                post("/db/index/relationship/hash/float/weight").
+                then().
+                assertThat().
+                statusCode(201);
+    }
+
+    @Test
+    public void integrationTestPostRelationshipDoubleIndex() {
+        when().
+                post("/db/index/relationship/hash/double/cost").
+                then().
+                assertThat().
+                statusCode(201);
+    }
+    @Test
+    public void integrationTestPostRelationshipStringIndex() {
+        when().
+                post("/db/index/relationship/hash/string/reason").
+                then().
+                assertThat().
+                statusCode(201);
+    }
+
+    @Test
+    public void integrationTestPostRelationshipFullTextIndex() {
+        when().
+                post("/db/index/relationship/full_text/string/description").
+                then().
+                assertThat().
+                statusCode(201);
+    }
+
+
 }
