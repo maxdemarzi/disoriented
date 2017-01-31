@@ -61,6 +61,15 @@ public class PropertyContainer {
         return (Double) properties.get(key);
     }
 
+    public String getLowerCaseStringProperty(String key) {
+        String property = (String)properties.get(key);
+        if (property == null) {
+            return null;
+        } else {
+            return property.toLowerCase();
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         // self check

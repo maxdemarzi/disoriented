@@ -56,4 +56,31 @@ public class IndexTest {
                 assertThat().
                 statusCode(200);
     }
+
+    @Test
+    public void integrationTestPostNodeIndex() {
+        when().
+                post("/db/index/node/navigable/integer/birth_year").
+        then().
+                assertThat().
+                statusCode(201);
+    }
+
+    @Test
+    public void integrationTestPostRelationshipIndex() {
+        when().
+                post("/db/index/relationship/hash/integer/rating").
+        then().
+                assertThat().
+                statusCode(201);
+    }
+
+    @Test
+    public void integrationTestPostFullTextNodeIndex() {
+        when().
+                post("/db/index/node/full_text/string/last_name").
+                then().
+                assertThat().
+                statusCode(201);
+    }
 }

@@ -75,7 +75,17 @@ public class Disoriented {
 
     public boolean addNodeIndex(Index<PropertyContainer> index, String property) {
         nodes.addIndex(index);
-        indexes.get(property).add(index.toString());
+        Set<String> set = indexes.getOrDefault(property, new HashSet<>());
+        set.add(index.toString());
+        indexes.put(property, set);
+        return true;
+    }
+
+    public boolean addRelationshipIndex(Index<PropertyContainer> index, String property) {
+        relationships.addIndex(index);
+        Set<String> set = indexes.getOrDefault(property, new HashSet<>());
+        set.add(index.toString());
+        indexes.put(property, set);
         return true;
     }
 
